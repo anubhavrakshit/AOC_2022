@@ -3,14 +3,20 @@
 #include <map>
 #include <sstream>
 
-enum game_move {R = 'A', P = 'B', S = 'C', RO = 'X', PA = 'Y', SI = 'Z'};
 using namespace std;
+// Opponents moves and Your moves 
+// Opponent R rock P paper S scissor
+// Your RO rock PA paper SI scissor 
+enum game_move {R = 'A', P = 'B', S = 'C', RO = 'X', PA = 'Y', SI = 'Z'};
+// Give score for opponent and your move
 int play(game_move opp, game_move you) {
     map <game_move, int> shape_score;
     shape_score[RO] = 1;
     shape_score[PA] = 2;
     shape_score[SI] = 3;
 
+    // Table with scores for a pair of moves
+    // {opponent move, your move} -> Score
     map <pair<game_move, game_move>, int> outcome;
     // Draw 3 points
     outcome[{R, RO}] = 3;
@@ -30,6 +36,8 @@ int play(game_move opp, game_move you) {
 
 int choose_move(game_move opp, game_move you) {
     map<game_move, game_move> loose, win, draw;
+    
+    // What should be your move?
     loose[R] = SI;
     loose[P] = RO;
     loose[S] = PA;
@@ -40,6 +48,7 @@ int choose_move(game_move opp, game_move you) {
     win[P] = SI;
     win[S] = RO;
     
+    // Your intent?
     if (you == RO) {
         // Loose
         cout << "Loose" << endl;
@@ -66,7 +75,6 @@ int main() {
         cout << "Score " << score << endl;
         total_score += score;
     }
-
     cout << "Total Score " << total_score << endl;
     return 0;
 }
