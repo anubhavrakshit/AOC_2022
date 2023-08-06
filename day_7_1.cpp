@@ -5,6 +5,7 @@
 #include <stack>
 using namespace std;
 
+// Type is either (D)irectory or (F)ile
 enum de_type {D, F};
 struct dirent {
     string name;
@@ -15,11 +16,11 @@ using dirents = vector<dirent>;
 
 int dfs(unordered_map<string, dirents>& index, string dir, unordered_map<string, int>& memo) {
     
-    cout << "Look up " << dir << endl;
     if (index.find(dir) == index.end()) {
-        return 0;
+        assert(0);
     } 
     if (memo.find(dir) != memo.end()) {
+        cout << "Cache Hit!!" << endl;
         return memo[dir];
     }
 
@@ -44,7 +45,7 @@ int dfs(unordered_map<string, dirents>& index, string dir, unordered_map<string,
 
 // Get the Current Working Dir path from
 // pwd stack
-string get_cwd(stack<string> pwd) {
+string get_pwd_path(stack<string> pwd) {
     if (pwd.size() <= 1) {
         return "/";
     }
@@ -65,16 +66,13 @@ string get_cwd(stack<string> pwd) {
     return path;
 }
 
-int main() {
-    stack<string> pwd;
-    unordered_map<string, dirents> index;
-
+void parse(unordered_map<string, dirents> &index) {
     // Maintain a Present Working Dir in a stack.
-    // Use this to determing what the path should be for 
-    // directory entries in a Directory
+    // Use this to determing the path for directory entries
     // Use this path as a key to store the directory entries
-    // Keep this in an index
+    // Keep this in an map called index
     string line;
+    stack<string> pwd;
     while (getline(cin, line)) {
         stringstream ss(line);
         string tok;
@@ -111,15 +109,17 @@ int main() {
                     size = stoi(tok);
                 }
                 ss >> name;
-                string cwd = get_cwd(pwd);
-                cout << "CWD: " << cwd << endl;
+                string cwd = get_pwd_path(pwd);
                 // Store the path -> dirent in index
                 index[cwd].push_back({name, type, size});
             }
         }
     }
+}
 
-    // This is our index
+int main() {
+    unordered_map<string, dirents> index;
+    parse(index);
     for (auto& kv : index) {
         cout << "Dir " << kv.first << endl;
         for (auto& de : kv.second) {
