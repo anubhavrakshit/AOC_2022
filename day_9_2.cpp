@@ -55,6 +55,7 @@ void follow(pos& head, pos& tail) {
             tail.first--;
         }
     } else {
+		// Figure out which Quadrant to move
         if (head.first > tail.first) { // Towards right
             if (head.second > tail.second) { // Up
                 tail.first += 1;
@@ -76,12 +77,17 @@ void follow(pos& head, pos& tail) {
 }
 
 int main() {
+	// 0 index is for Head and rest are Knot 1, 2, 3 ...9
+	// We will store positions of each Knot and Head in this 
+	// array
+	vector<pos> all_knots(10);
+	// Initial co-ordinate  is (0, 0)
+	for (int i = 0; i < 10; i++) {
+		all_knots[i] = {0, 0};
+	}
+
     string line;
     set<pos> visit;
-    pos head, tail;
-    head = {0, 0};
-    tail = {0, 0};
-    visit.insert(tail);
     while (getline(cin, line)) {
         stringstream ss(line);
         char dir;
@@ -89,9 +95,13 @@ int main() {
         ss >> dir >> nsteps;
         assert(nsteps > 0);
         while (nsteps--) {
+			pos& head = all_knots[0];
             move_single(head, dir);
-            follow(head, tail);
-            visit.insert(tail);
+			// Make each knot follow the closest tail
+			for (int i = 1; i < 10; i++) {
+            	follow(all_knots[i - 1], all_knots[i]);
+			}
+            visit.insert(all_knots[9]);
         }
     }
     cout << "Unique visit " << visit.size() << endl;
