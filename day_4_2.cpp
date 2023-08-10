@@ -1,6 +1,6 @@
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 using namespace std;
 
@@ -16,7 +16,7 @@ int main() {
         cout << "Range" << l1 << "-" << h1 << "," << l2 << "-" << h2 << endl;
         if (l1 <= l2 and l2 >= l1 and l2 <= h1) {
             num_overlaps++;
-        } else if (l2 <= l1 and l1 >= l2 and l1 <= h2 ) {
+        } else if (l2 <= l1 and l1 >= l2 and l1 <= h2) {
             num_overlaps++;
         }
     }

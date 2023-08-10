@@ -1,13 +1,13 @@
-#include <iostream>
-#include <string>
-#include <sstream>
 #include <algorithm>
+#include <iostream>
+#include <sstream>
+#include <string>
 using namespace std;
 
 int main() {
     int max_cal_sofar{0}, current_cal{0};
     string input;
-    vector<int> cals;   
+    vector<int> cals;
     while (getline(cin, input)) {
         if (!input.length()) {
             cals.push_back(current_cal);

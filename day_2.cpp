@@ -1,23 +1,23 @@
 #include <iostream>
-#include <string>
 #include <map>
 #include <sstream>
+#include <string>
 
 using namespace std;
-// Opponents moves and Your moves 
+// Opponents moves and Your moves
 // Opponent R rock P paper S scissor
-// Your RO rock PA paper SI scissor 
-enum game_move {R = 'A', P = 'B', S = 'C', RO = 'X', PA = 'Y', SI = 'Z'};
+// Your RO rock PA paper SI scissor
+enum game_move { R = 'A', P = 'B', S = 'C', RO = 'X', PA = 'Y', SI = 'Z' };
 // Give score for opponent and your move
 int play(game_move opp, game_move you) {
-    map <game_move, int> shape_score;
+    map<game_move, int> shape_score;
     shape_score[RO] = 1;
     shape_score[PA] = 2;
     shape_score[SI] = 3;
 
     // Table with scores for a pair of moves
     // {opponent move, your move} -> Score
-    map <pair<game_move, game_move>, int> outcome;
+    map<pair<game_move, game_move>, int> outcome;
     // Draw 3 points
     outcome[{R, RO}] = 3;
     outcome[{P, PA}] = 3;
@@ -30,13 +30,13 @@ int play(game_move opp, game_move you) {
     outcome[{R, PA}] = 6;
     outcome[{P, SI}] = 6;
     outcome[{S, RO}] = 6;
-    
-    return  outcome[{opp, you}] + shape_score[you];
+
+    return outcome[{opp, you}] + shape_score[you];
 }
 
 int choose_move(game_move opp, game_move you) {
     map<game_move, game_move> loose, win, draw;
-    
+
     // What should be your move?
     loose[R] = SI;
     loose[P] = RO;
@@ -47,7 +47,7 @@ int choose_move(game_move opp, game_move you) {
     win[R] = PA;
     win[P] = SI;
     win[S] = RO;
-    
+
     // Your intent?
     if (you == RO) {
         // Loose
@@ -71,7 +71,8 @@ int main() {
         stringstream ss(input);
         char opp, you;
         ss >> opp >> you;
-        int score = choose_move(static_cast<game_move>(opp), static_cast<game_move>(you));
+        int score = choose_move(static_cast<game_move>(opp),
+                                static_cast<game_move>(you));
         cout << "Score " << score << endl;
         total_score += score;
     }

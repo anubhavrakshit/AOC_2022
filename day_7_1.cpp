@@ -1,12 +1,12 @@
 #include <iostream>
-#include <unordered_map>
-#include <string>
 #include <sstream>
 #include <stack>
+#include <string>
+#include <unordered_map>
 using namespace std;
 
 // Type is either (D)irectory or (F)ile
-enum de_type {D, F};
+enum de_type { D, F };
 struct dirent {
     string name;
     de_type type;
@@ -14,11 +14,12 @@ struct dirent {
 };
 using dirents = vector<dirent>;
 
-int dfs(unordered_map<string, dirents>& index, string dir, unordered_map<string, int>& memo) {
-    
+int dfs(unordered_map<string, dirents> &index, string dir,
+        unordered_map<string, int> &memo) {
+
     if (index.find(dir) == index.end()) {
         assert(0);
-    } 
+    }
     if (memo.find(dir) != memo.end()) {
         cout << "Cache Hit!!" << endl;
         return memo[dir];
@@ -60,7 +61,7 @@ string get_pwd_path(stack<string> pwd) {
             continue;
         } else {
             curdir = "/" + curdir;
-            path = curdir + path; 
+            path = curdir + path;
         }
     }
     return path;
@@ -120,9 +121,9 @@ void parse(unordered_map<string, dirents> &index) {
 int main() {
     unordered_map<string, dirents> index;
     parse(index);
-    for (auto& kv : index) {
+    for (auto &kv : index) {
         cout << "Dir " << kv.first << endl;
-        for (auto& de : kv.second) {
+        for (auto &de : kv.second) {
             cout << "- " << de.name << " - " << de.size << endl;
         }
     }

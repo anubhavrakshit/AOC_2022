@@ -1,7 +1,7 @@
 #include <iostream>
-#include <string>
 #include <set>
 #include <sstream>
+#include <string>
 
 using namespace std;
 
@@ -13,7 +13,7 @@ int get_prio(char item) {
     return 1 + item - 'a';
 }
 
-int main () {
+int main() {
     string line;
     int priority{0};
     while (getline(cin, line)) {

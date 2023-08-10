@@ -1,11 +1,10 @@
 #include <iostream>
-#include <string>
 #include <sstream>
+#include <string>
 
 using namespace std;
 
 int main() {
-
     string line;
     int num_overlaps{0};
     while (getline(cin, line)) {
