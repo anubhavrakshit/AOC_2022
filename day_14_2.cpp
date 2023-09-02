@@ -14,10 +14,8 @@ void mark_in_map(set<rockpos> &block_map, vector<rockline> &all_rlines) {
     block_map.insert(prev);
     for (int i = 1; i < rline.size(); i++) {
       rockpos next = rline[i];
-      int x1 = prev.first;
-      int y1 = prev.second;
-      int x2 = next.first;
-      int y2 = next.second;
+      auto [x1, y1] = prev;
+      auto [x2, y2] = next;
       // Up
       if (x1 == x2 and y2 < y1) {
         for (int i = y2; i <= y1; i++) {
@@ -49,6 +47,8 @@ void mark_in_map(set<rockpos> &block_map, vector<rockline> &all_rlines) {
   }
 }
 
+
+
 int main() {
   string line;
   vector<rockline> all_rlines;
@@ -71,13 +71,6 @@ int main() {
     all_rlines.push_back(rl);
   }
 
-  for (auto &rl : all_rlines) {
-    for (auto &[rpos_x, rpos_y] : rl) {
-      cout << rpos_x << "," << rpos_y << "->";
-    }
-    cout << endl;
-  }
-
   set<rockpos> block_map;
   mark_in_map(block_map, all_rlines);
   rockpos fillpos{500, 0};
@@ -91,34 +84,40 @@ int main() {
     rockpos right = {2, 0};
     cout << "Sand num " << sand_num << endl;
 
-    while (block_map.find(cur_pos) == block_map.end()) {
-      cout << "Cur pos " << cur_pos.first << ":" << cur_pos.second << endl;
+    auto is_cur_pos_blocked = [&] () {
+      return (block_map.find(cur_pos) != block_map.end()); 
+    };
+    while (!is_cur_pos_blocked()) {
+      //cout << "Cur pos " << cur_pos.first << ":" << cur_pos.second << endl;
       auto saved_pos = cur_pos;
       // Go down one step
-      cur_pos.first += down.first;
       cur_pos.second += down.second;
       // If we are hitting the floor 
       if (cur_pos.second == deepest_y_pos) {
         block_map.insert(saved_pos);
         break;
       }
-      // If blocked move left
-      if (block_map.find(cur_pos) != block_map.end()) {
-        cur_pos.first += left.first;
-        // If blocked move right
-        if (block_map.find(cur_pos) != block_map.end()) {
-          cur_pos.first += right.first;
-          cur_pos.second += right.second;
-          // Completely blocked
-          if (block_map.find(cur_pos) != block_map.end()) {
-            block_map.insert(saved_pos);
-            if (saved_pos == fillpos) {
-                is_filled = true;
-            }
-            break;
-          }
-        }
+
+      if (!is_cur_pos_blocked()) {
+        continue;
       }
+      // Try left pos
+      cur_pos.first += left.first;
+      if (!is_cur_pos_blocked()) {
+        continue;
+      }
+      // Try right pos
+      cur_pos.first += right.first;
+      if (!is_cur_pos_blocked()) {
+        continue;
+      }
+
+      // Nowhere to go just place sand here
+      block_map.insert(saved_pos);
+      if (saved_pos == fillpos) {
+        is_filled = true;
+      }
+      break;
     }
 
     sand_num++;
