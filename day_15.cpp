@@ -4,6 +4,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
 using sensor = pair<long, long>;
@@ -20,65 +21,35 @@ long get_mdist(sensor s, beacon b) {
 /// @param pos_map sensor, beacon, non beacon map
 /// @param bdist beacon distance
 /// @param y position of line to mark non beacons '#'
-void mark_no_beacon(sensor s, map<pos, char> &pos_map, long bdist, long y) {
+int get_no_beacon_count_at_y(sensor s, map<pos, char> &pos_map, long bdist, long y) {
+  int num_nb{0};
   // Where is sensor relative to y ?
-  if (s.second < y) {
+  if (s.second < y and s.second + bdist < y) {
     // Sensor above
-    if (s.second + bdist < y) {
-      // sensor too far away
-      cout << "Sensor above and too far away: " << s.first << "-" << s.second
-           << endl;
-      return;
-    }
-
-    // Find all possible left and right postions from sensors which
-    // will drop vertical lines where there can be no beacons
-    for (long i = 0; i <= bdist; i++) {
-      if (s.second + bdist - i >= y) {
-        if (pos_map.find({s.first - i, y}) == pos_map.end()) {
-          pos_map[{s.first - i, y}] = '#';
-        }
-        if (pos_map.find({s.first + i, y}) == pos_map.end()) {
-          pos_map[{s.first + i, y}] = '#';
-        }
-      } else {
-        break;
-      }
-    }
-
-  } else if (s.second > y) {
+    // sensor too far away
+    // cout << "Sensor above and too far away: " << s.first << "-" << s.second
+    //     << endl;
+    return num_nb;
+  } else if (s.second > y and s.second - bdist > y) {
     // Sensor below
-    if (s.second - bdist > y) {
-      // sensor too far away
-      cout << "Sensor below and too far away: " << s.first << "-" << s.second
-           << endl;
-      return;
-    }
+    // sensor too far away
+    // cout << "Sensor below and too far away: " << s.first << "-" << s.second
+    //     << endl;
+    return num_nb;
+  }
+  // Vertical distance of 'y' line from Sensor
+  auto y2 = abs(y - s.second);
+  pos left_bound = {s.first - bdist + y2, y};
+  pos right_bound = {s.first + bdist - y2, y};
 
-    for (long i = 0; i <= bdist; i++) {
-      if (s.second - bdist + i <= y) {
-        if (pos_map.find({s.first - i, y}) == pos_map.end()) {
-          pos_map[{s.first - i, y}] = '#';
-        }
-        if (pos_map.find({s.first + i, y}) == pos_map.end()) {
-          pos_map[{s.first + i, y}] = '#';
-        }
-      } else {
-        break;
-      }
-    }
-  } else {
-    // On y line
-    cout << "Sensor same line: " << s.first << "-" << s.second << endl;
-    for (long i = 0; i <= bdist; i++) {
-      if (pos_map.find({s.first - i, s.second}) == pos_map.end()) {
-        pos_map[{s.first - i, s.second}] = '#';
-      }
-      if (pos_map.find({s.first + i, s.second}) == pos_map.end()) {
-        pos_map[{s.first + i, s.second}] = '#';
-      }
+  for (int i = left_bound.first; i <= right_bound.first; i++) {
+    if (pos_map.find({i, y}) == pos_map.end()) {
+      num_nb++;
+      pos_map[{i, y}] = '#';
     }
   }
+
+  return num_nb;
 }
 
 /// @brief  Breadth First to find all possible non beacon positions
@@ -142,26 +113,29 @@ int main() {
 
   // Create a map of all the sensors and beacons first
   map<pos, char> pos_map;
+  unordered_map<int, int> y_count;
   for (auto &[k, v] : sb_map) {
     // Mark sensor and beacon
     pos_map[k] = 'S';
     pos_map[v] = 'B';
+    y_count[k.second]++;
+    y_count[v.second]++;
     assert(k != v);
   }
-  long y_line = 2000000;
-  for (auto &[s, b] : sb_map) {
-    // if no beacon mark '#'
-    long dist = get_mdist(s, b);
-    mark_no_beacon(s, pos_map, dist, y_line);
+  
+  int y = 2000000;
+  for (auto& [s, b] : sb_map) {
+    auto bdist = get_mdist(s , b);
+    get_no_beacon_count_at_y(s, pos_map, bdist, y);
   }
 
-  long no_beacon{0};
-  for (auto &[p, c] : pos_map) {
-    if (p.second == y_line and c == '#') {
-      no_beacon++;
+  int nb_count = 0;
+  for (auto& [p, t] : pos_map) {
+    if (p.second == y and t == '#') {
+      nb_count++;
     }
   }
 
-  cout << "No beacon count " << no_beacon << endl;
+  cout << "Ans is " << nb_count << endl;
   return 0;
 }
